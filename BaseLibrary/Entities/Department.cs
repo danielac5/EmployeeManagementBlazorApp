@@ -1,7 +1,6 @@
 ﻿
-namespace BaseLibrary.Entities
+namespace BaseLibrary.Entities;
+
+public class Department : BaseEntity
 {
-    public class Department : BaseEntity
-    {
-    }
 }

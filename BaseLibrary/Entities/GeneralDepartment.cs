@@ -1,8 +1,7 @@
 ﻿
-namespace BaseLibrary.Entities
-{
-    public class GeneralDepartment : BaseEntity
-    {
+namespace BaseLibrary.Entities;
 
-    }
+public class GeneralDepartment : BaseEntity
+{
+
 }

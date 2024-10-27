@@ -1,13 +1,12 @@
 ﻿using BaseLibrary.DTO;
 using BaseLibrary.Responses;
 
-namespace ServerLibrary.Repositories.Contracts
-{
-    public interface IUserAccount
-    {
-        Task<GeneralResponse> CreateAsync(Register user);
-        Task<LoginResponse> SignInAsync(Login user);
+namespace ServerLibrary.Repositories.Contracts;
 
-        Task<LoginResponse> RefreshTokenAsync(RefreshToken token);
-    }
+public interface IUserAccount
+{
+    Task<GeneralResponse> CreateAsync(Register user);
+    Task<LoginResponse> SignInAsync(Login user);
+
+    Task<LoginResponse> RefreshTokenAsync(RefreshToken token);
 }

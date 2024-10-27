@@ -1,6 +1,5 @@
-﻿namespace BaseLibrary.Entities
+﻿namespace BaseLibrary.Entities;
+
+public class Branch : BaseEntity
 {
-    public class Branch : BaseEntity
-    {
-    }
 }

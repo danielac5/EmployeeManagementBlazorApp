@@ -1,10 +1,9 @@
 ﻿
 using System.Text.Json.Serialization;
 
-namespace BaseLibrary.Entities
+namespace BaseLibrary.Entities;
+
+public class Relationship
 {
-    public class Relationship
-    {
-        
-    }
+    
 }
