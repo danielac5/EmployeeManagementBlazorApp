@@ -23,7 +23,11 @@ public class UserAccountService(GetHttpClient getHttpClient) : IUserAccountServi
     {
         var httpClient = getHttpClient.GetPublicHttpClient();
         var result = await httpClient.PostAsJsonAsync($"{AuthUrl}/login", user);
-        if (!result.IsSuccessStatusCode) return new LoginResponse(false, "Error occured");
+        if (!result.IsSuccessStatusCode)
+        {
+            var errorResponse = await result.Content.ReadAsStringAsync();
+            return new LoginResponse(false, $"Error occured: {errorResponse}");
+        }
 
         return await result.Content.ReadFromJsonAsync<LoginResponse>()!;
     }

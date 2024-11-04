@@ -1,24 +1,46 @@
 ﻿@page "/identity/account/login"
-<div class="container">
-    <div class="col-lg-6">
-        <EditForm Enhance Model="User" OnValidSubmit="HandleLogin">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div class="card">
-                <div class="card-header">Fill this form to Login</div>
-                <div class="card-body">
-                    <div class="form-group mt-3">
-                        <label class="form-label">Email</label>
-                        <InputText @bind-Value="User.Email" class="form-control"></InputText>
-                    </div>
+@using Client.Pages.OtherPages
+@using Syncfusion.Blazor.Popups
+@layout AuthenticationLayout
+@inject SfDialogService DialogService
 
+<div class="container d-flex justify-content-center align-items-center" style="height: 100vh;">
+    <div class="col-lg-4 col-md-6 col-sm-8">
+        <EditForm Model="User" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <div class="card bg-dark" style="opacity:0.8; border-radius:10px; color:white; font-weight:bold;">
+                <div class="card-header text-center fs-5 mb-2">Login</div>
+                <div class="card-body text-center">
+                    <img src="../Images/CompanyLogo/lg.png" class="mb-4" style="border-radius:20px; height:50px; width:50px;" />
                     <div class="form-group mt-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" @bind="User.Password" class="form-control"></input>
+                        <label class="form-label d-block text-start">Email</label>
+                        <InputText @bind-Value="User.Email" class="form-control" required></InputText>
                     </div>
                     <div class="form-group mt-3">
-                        <button class="btn btn-outline-primary float-end" type="submit">Login</button>
+                        <label class="form-label d-block text-start">Password</label>
+                        <InputText type="password" @bind-Value="User.Password" class="form-control" required></InputText>
                     </div>
+                    <div class="form-group mt-3">
+                        @if (ShowLoadingButton)
+                        {
+                            <ButtonLoadingSpinner />
+                        }
+                        else
+                        {
+                            <button class="btn btn-outline-primary w-100" type="submit">Login</button>
+                        }
+                    </div>
+                    @if (!string.IsNullOrEmpty(ErrorMessage))
+                    {
+                        <div class="alert alert-danger mt-2">@ErrorMessage</div>
+                    }
+                </div>
+                <div class="card-footer text-center">
+                    <span>
+                        Don't have an account? |
+                        <a class="btn-link" href="identity/account/register">Sign Up</a>
+                    </span>
+                    <ValidationSummary />
                 </div>
             </div>
         </EditForm>
@@ -26,10 +48,22 @@
 </div>
 
 @code {
+    public bool ShowLoadingButton { get; set; } = false;
+    public string ErrorMessage { get; set; } = string.Empty; //adauga un camp pentru mesajul de eroare
     Login User = new();
+
+    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        await CheckUserAuthentication();
+    }
+
     async Task HandleLogin()
     {
+        ShowLoadingButton = true; // seteaza butonul de incarcare inainte de apelul de autentificare
+
         var result = await accountService.SignInAsync(User);
+
         if (result.Flag)
         {
             var customAuthStateProvider = (CustomAutheticationStateProvider)AuthStateProvider;
@@ -41,5 +75,24 @@
 
             NavManager.NavigateTo("/", forceLoad: true);
         }
+        else
+        {
+            await DisplayDialog(result.Message, "Alert");            
+        }
+
+        ShowLoadingButton = false; // reseteaza butonul de incarcare dupa apel
+    }
+
+    private async Task DisplayDialog(string content, string title)
+    {
+        await DialogService.AlertAsync(content, title);
+    }
+
+    private async Task CheckUserAuthentication()
+    {
+        var user = (await AuthenticationState).User;
+        bool isUserAuthenticated = user.Identity!.IsAuthenticated;
+        if (isUserAuthenticated)
+            NavManager.NavigateTo("/home/dashboard");
     }
 }
