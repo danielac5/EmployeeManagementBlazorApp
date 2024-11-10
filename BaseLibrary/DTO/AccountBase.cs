@@ -9,8 +9,9 @@ public class AccountBase
     [EmailAddress]
     [Required]
 
-    public string? Email {  get; set; }
+    public string? Email { get; set; }
     [DataType(DataType.Password)]
-    [Required]
+    [Required]  
+
     public string? Password { get; set; }
 }

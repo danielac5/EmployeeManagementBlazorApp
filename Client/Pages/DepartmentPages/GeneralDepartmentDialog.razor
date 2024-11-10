@@ -1,4 +1,5 @@
 ﻿
+@using BaseLibrary.Entities
 @using Syncfusion.Blazor.Buttons
 @using Syncfusion.Blazor.Popups
 
@@ -30,7 +31,7 @@
 </SfDialog>
 
 @code {
-    [Parameter] public GeneralDepartmentDTO Department { get; set; } = new();
+    [Parameter] public GeneralDepartment Department { get; set; } = new();
     private bool IsVisible { get; set; } = false;
     public void OpenDialog()
     {
