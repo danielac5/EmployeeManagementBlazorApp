@@ -52,7 +52,7 @@
     public string ErrorMessage { get; set; } = string.Empty; //adauga un camp pentru mesajul de eroare
     Login User = new();
 
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    [CascadingParameter] public Task<AuthenticationState>? AuthenticationState { get; set; }
     protected async override Task OnInitializedAsync()
     {
         await CheckUserAuthentication();
@@ -85,12 +85,12 @@
 
     private async Task DisplayDialog(string content, string title)
     {
-        await DialogService.AlertAsync(content, title);
+        await dialogService.AlertAsync(content, title);
     }
 
     private async Task CheckUserAuthentication()
     {
-        var user = (await AuthenticationState).User;
+        var user = (await AuthenticationState!).User;
         bool isUserAuthenticated = user.Identity!.IsAuthenticated;
         if (isUserAuthenticated)
             NavManager.NavigateTo("/home/dashboard");

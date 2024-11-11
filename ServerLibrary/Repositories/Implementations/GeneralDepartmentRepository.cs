@@ -12,11 +12,11 @@ public class GeneralDepartmentRepository(AppDbContext appDbContext) : IGenericRe
     public async Task<GeneralResponse> DeleteById(int id)
     {
         var dep = await appDbContext.GeneralDepartments.FindAsync(id);
-        if (dep is not null) return Success();
+        if (dep is null) return NotFound();
         
         appDbContext.GeneralDepartments.Remove(dep);
         await Commit();
-        return Success();
+        return DeleteSuccess();
     }
 
     public async Task<List<GeneralDepartment>> GetAll() => await appDbContext.GeneralDepartments.ToListAsync();
@@ -25,30 +25,34 @@ public class GeneralDepartmentRepository(AppDbContext appDbContext) : IGenericRe
 
     public async Task<GeneralResponse> Insert(GeneralDepartment item)
     {
-        if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Departament deja adăugat");
+        var checkIfNull = await CheckName(item.Name);
+        if (!checkIfNull) 
+            return new GeneralResponse(false, "Departament General deja adăugat");
         appDbContext.GeneralDepartments.Add(item);
         await Commit();
-        return Success();
+        return InsertSuccess();
     }
-
+     
     public async Task<GeneralResponse> Update(GeneralDepartment item)
     {
         var dep = await appDbContext.GeneralDepartments.FindAsync(item.Id);
         if (dep is null) return NotFound();
         dep.Name = item.Name;
         await Commit();
-        return Success();
+        return UpdateSuccess();
     }
 
     private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
 
-    private static GeneralResponse Success() => new(true, "Proces complet");
+    private static GeneralResponse DeleteSuccess() => new(true, "Departament șters");
+    private static GeneralResponse InsertSuccess() => new(true, "Departament adăugat");
+    private static GeneralResponse UpdateSuccess() => new(true, "Modificări aplicate");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 
     private async Task<bool> CheckName(string name)
     {
-        var item = await appDbContext.Departments.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
+        var item = await appDbContext.GeneralDepartments.FirstOrDefaultAsync(x => x.Name!.ToLower().Equals(name.ToLower()));
         return item is null;
     }
 }

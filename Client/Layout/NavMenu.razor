@@ -3,7 +3,7 @@
 @using Client.ApplicationStates
 @using Microsoft.AspNetCore.Components.Authorization
 
-@inject DepartmentState departmentState
+@inject AllState departmentState
 
 <AuthorizeView>
     <Authorized>
@@ -19,89 +19,130 @@
         </div>
 
         <div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu" style="background-image: linear-gradient(180deg, #020f1c 0%, #004466 100%); width: 260px;">
-                    <!-- Ajustează lățimea -->
-                    <nav class="flex-column">
-                        @* Definirea distanțării uniforme pentru toate elementele *@
-                        <div class="nav-item px-3 mb-2">
-                            <!-- Ajustează margin-bottom -->
-                            <NavLink class="nav-link p-2" href="/home/dashboard">
-                                <div class="hstack align-items-center">
-                                    <span class="bi bi-house-door-fill-nav-menu fs-3" aria-hidden="true"></span>
-                                    <span class="ms-2">Home</span>
-                                </div>
-                            </NavLink>
+            <nav class="flex-column">
+                <div class="nav-item px-3 mb-2">
+                    <NavLink class="nav-link p-2" href="/home/dashboard">
+                        <div class="hstack align-items-center">
+                            <span class="bi bi-house-door-fill-nav-menu fs-3" aria-hidden="true"></span>
+                            <span class="ms-2">Home</span>
                         </div>
-
-                        <div class="nav-item px-3 mb-2">
-                            <!-- Ajustează margin-bottom -->
-                            <NavLink class="nav-link p-2" href="counter">
-                                <div class="hstack align-items-center">
-                                    <span class="bi bi-plus-square-fill-nav-menu fs-3" aria-hidden="true"></span>
-                                    <span class="ms-2">Counter</span>
-                                </div>
-                            </NavLink>
-                        </div>
-
-                        <div class="nav-item px-3 mb-2">
-                            <!-- Ajustează margin-bottom -->
-                            <NavLink class="nav-link p-2" @onclick="ShowAdminMenuContainer" style="cursor:pointer;" href="javascript:void()">
-                                <div class="hstack align-items-center">
-                                    <span class="bi bi-person-fill fs-3" aria-hidden="true" style="line-height: 1;"></span>
-                                    <span class="ms-2">Administration</span>
-                                </div>
-                            </NavLink>
-                            <a class="nav-link p-2 text-white" style="margin-left:5rem; visibility:@CssStyle">
-                                <div class="hstack align-items-center">
-                                    <span class="bi bi-people fs-5" aria-hidden="true" style="line-height: 1;"></span>
-                                    <span class="ms-2">Users</span>
-                                </div>
-                            </a>
-                        </div>
-
-                        <div class="nav-item px-3 mb-2" style="margin-top: @DepartmentMargin">
-                            <!-- Ajustează margin-bottom -->
-                            <NavLink class="nav-link p-2" @onclick="ShoWDepartmentContainer" style="cursor:pointer;" href="javascript:void()">
-                                <div class="hstack align-items-center">
-                                    <span class="bi bi-backpack4-fill fs-3" aria-hidden="true" style="line-height: 1;"></span>
-                                    <span class="ms-2">Department</span>
-                                </div>
-                            </NavLink>
-
-                            <div class="nav-link p-2 text-white" style="margin-left:5rem; visibility: @DepartmentCssStyle">
-                                <ul class="list-group">
-                                    <li style="list-style:none" class="cusorStyle mb-2">
-                                        <a class="nav-link p-2" @onclick="GeneralDepartmentClicked">
-                                            <div class="hstack align-items-center">
-                                                <span class="bi bi-file-medical fs-5" aria-hidden="true" style="line-height: 1;"></span>
-                                                <span class="ms-2 fs-6">General</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li style="list-style:none" class="cusorStyle mb-2">
-                                        <a class="nav-link p-2">
-                                            <div class="hstack align-items-center">
-                                                <span class="bi bi-substack fs-5" aria-hidden="true" style="line-height: 1;"></span>
-                                                <span class="ms-2">Department</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                    <li style="list-style:none" class="cusorStyle mb-2">
-                                        <a class="nav-link p-2">
-                                            <div class="hstack align-items-center">
-                                                <span class="bi bi-chevron-bar-contract fs-5" aria-hidden="true" style="line-height: 1;"></span>
-                                                <span class="ms-2">Branch</span>
-                                            </div>
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </nav>
+                    </NavLink>
                 </div>
 
+                <div class="nav-item px-3 mb-2">
+                    <NavLink class="nav-link p-2" @onclick="ShowAdminMenuContainer" style="cursor:pointer;" href="javascript:void()">
+                        <div class="hstack align-items-center">
+                            <span class="bi bi-person-fill fs-3" aria-hidden="true" style="line-height: 1;"></span>
+                            <span class="ms-2">Administrare</span>
+                        </div>
+                    </NavLink>
+                    <a class="nav-link p-2 text-white" style="margin-left:2rem; visibility:@CssStyle; margin-top: 1rem;">
+                        <div class="hstack align-items-center" @onclick="UserClicked">
+                            <span class="bi bi-people fs-5" aria-hidden="true" style="line-height: 1;"></span>
+                            <span class="ms-2">Utilizatori</span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="nav-item px-3 mb-2" style="margin-top: @DepartmentMargin">
+                    <NavLink class="nav-link p-2" @onclick="ShoWDepartmentContainer" style="cursor:pointer;" href="javascript:void()">
+                        <div class="hstack align-items-center">
+                            <span class="bi bi-backpack4-fill fs-5" aria-hidden="true" style="line-height: 1;"></span>
+                            <span class="ms-2">Management</span>
+                        </div>
+                    </NavLink>
+
+                    <div class="nav-link p-2 text-white" style="margin-left: 1rem; visibility: @DepartmentCssStyle; width: 100%; display: flex; align-items: center; white-space: nowrap;">
+                        <ul class="list-group">
+                            <li style="list-style:none" class="cusorStyle mb-2">
+                                <a class="nav-link p-2" @onclick="GeneralDepartmentClicked">
+                                    <div class="hstack align-items-center">
+                                        <span class="bi bi-file-medical fs-5" aria-hidden="true" style="line-height: 1;"></span>
+                                        <!-- Micșorăm textul și îl aliniem corect -->
+                                        <span class="ms-2">Departament General</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none" class="cusorStyle mb-2" @onclick="DepartmentClicked">
+                                <a class="nav-link p-2">
+                                    <div class="hstack align-items-center">
+                                        <span class="bi bi-substack fs-5" aria-hidden="true" style="line-height: 1;"></span>
+                                        <span class="ms-2">Departament</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none" class="cusorStyle mb-2" @onclick="BranchClicked">
+                                <a class="nav-link p-2">
+                                    <div class="hstack align-items-center">
+                                        <span class="bi bi-chevron-bar-contract fs-5" aria-hidden="true" style="line-height: 1;"></span>
+                                        <span class="ms-2">Branch</span>
+                                    </div>
+                                </a>
+                            </li>
+
+                            <li style="list-style:none">
+                                <hr />
+                            </li>
+
+                            <li style="list-style:none">
+                                <a class="nav-link p-2 cusorStyle" @onclick="CountryClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-geo-alt fs-5 text-center" aria-hidden="true"></span>
+                                        <span>Țări</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none">
+                                <a class="nav-link p-2 cusorStyle" @onclick="CityClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-pin-map-fill fs-5 text-center" aria-hidden="true"></span>
+                                        <span>Raioane</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none">
+                                <a class="nav-link p-2 cusorStyle" @onclick="TownClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-geo fs-5 text-center" aria-hidden="true"></span>
+                                        <span>Localități</span>
+                                    </div>
+                                </a>
+                            </li>
+                            <li style="list-style:none">
+                                <hr />
+                            </li>
+
+                            <li style="list-style:none">
+                                <a class="nav-link p-2 cusorStyle" @onclick="EmployeeClicked">
+                                    <div class="hstack">
+                                        <span class="bi bi-people-fill fs-5 text-center" aria-hidden="true"></span>
+                                        <span>Angajați</span>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </div>
 
     </Authorized>
 </AuthorizeView>
+
+<style>
+    .cursorStyle {
+        cursor: pointer;
+    }
+
+    .fs-6 {
+        font-size: 0.875rem; 
+    }
+
+    .hstack .bi {
+        line-height: 1; /* aliniere verticala pentru icons */
+    }
+</style>
+
 
 @code {
     private bool collapseNavMenu = true;
@@ -147,8 +188,19 @@
         }
     }
 
-    void GeneralDepartmentClicked()
-    {
-        departmentState.GeneralDepartmentClicked();
-    }
+    //General Departments /Department / Branch
+    void GeneralDepartmentClicked() => allState.GeneralDepartmentClicked();
+    void DepartmentClicked() => allState.DepartmentClicked();
+    void BranchClicked() => allState.BranchClicked();
+
+    //Country / City / Town
+    void CountryClicked() => allState.CountryClicked();
+    void CityClicked() => allState.CityClicked();
+    void TownClicked() => allState.TownClicked(); 
+
+    // User
+    void UserClicked() => allState.UserClicked();
+
+    //Employee
+    void EmployeeClicked() => allState.EmployeeClicked();
 }

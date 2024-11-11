@@ -9,5 +9,6 @@ public class Branch : BaseEntity
     public int DepartmentId { get; set; }
 
     //relationship one to many with Employee
+    [JsonIgnore]
     public List<Employee> Employees { get; set; }
 }

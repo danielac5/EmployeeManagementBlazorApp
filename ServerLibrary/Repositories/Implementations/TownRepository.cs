@@ -42,7 +42,7 @@ public class TownRepository(AppDbContext appDbContext) : IGenericRepositoryInter
 
     private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
 
-    private static GeneralResponse Success() => new(true, "Proces complet");
+    private static GeneralResponse Success() => new(true, "Departament adăugat");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 

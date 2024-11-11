@@ -19,7 +19,10 @@ public class DepartmentRepository(AppDbContext appDbContext) : IGenericRepositor
         return Success();
     }
 
-    public async Task<List<Department>> GetAll() => await appDbContext.Departments.ToListAsync();
+    public async Task<List<Department>> GetAll() => await appDbContext
+        .Departments.AsNoTracking() //to improve performance, cause we are just reading the data
+        .Include(gd => gd.GeneralDepartment)
+        .ToListAsync();
 
     public async Task<Department> GetById(int id) => await appDbContext.Departments.FindAsync(id);
 
@@ -42,7 +45,7 @@ public class DepartmentRepository(AppDbContext appDbContext) : IGenericRepositor
 
     private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
 
-    private static GeneralResponse Success() => new(true, "Proces complet");
+    private static GeneralResponse Success() => new(true, "Departament adăugat");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 

@@ -8,7 +8,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Compile Remove="Pages\DepartmentPages\GeneralDepartmentDialog.cs" />
+		<Compile Remove="Pages\ContentPages\DepartmentPages\GeneralDepartmentDialog.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -22,8 +22,10 @@
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="8.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="8.0.10" PrivateAssets="all" />
-		<PackageReference Include="Syncfusion.Blazor.Popups" Version="27.1.57" />
-		<PackageReference Include="Syncfusion.Blazor.Themes" Version="27.1.57" />
+		<PackageReference Include="Syncfusion.Blazor.Buttons" Version="27.1.58" />
+		<PackageReference Include="Syncfusion.Blazor.DropDowns" Version="27.1.58" />
+		<PackageReference Include="Syncfusion.Blazor.Popups" Version="27.1.58" />
+		<PackageReference Include="Syncfusion.Blazor.Themes" Version="27.1.58" />
 		<PackageReference Include="Syncfusion.Licensing" Version="27.1.58" />
 	</ItemGroup>
 

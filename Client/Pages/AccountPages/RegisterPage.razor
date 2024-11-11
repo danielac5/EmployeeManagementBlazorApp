@@ -60,7 +60,7 @@
     public bool ShowLoadingButton { get; set; } = false;
     Register User = new();
 
-    [CascadingParameter] public Task<AuthenticationState> AuthenticationState { get; set; }
+    [CascadingParameter] public Task<AuthenticationState>? AuthenticationState { get; set; }
     protected async override Task OnInitializedAsync()
     {
         await CheckUserAuthentication();
@@ -77,7 +77,7 @@
         }
         else
         {
-            await DisplayDialog(result.Message, "Alert");
+            await DisplayDialog(result.Message, "Eroare");
         }
         ShowLoadingButton = false;
     }
@@ -89,7 +89,7 @@
 
     private async Task CheckUserAuthentication()
     {
-        var user = (await AuthenticationState).User;
+        var user = (await AuthenticationState!).User;
         bool isUserAuthenticated = user.Identity!.IsAuthenticated;
         if (isUserAuthenticated)
             NavManager.NavigateTo("/home/dashboard");

@@ -1,4 +1,6 @@
 ﻿
+using System.Text.Json.Serialization;
+
 namespace BaseLibrary.Entities;
 
 public class City : BaseEntity
@@ -8,5 +10,6 @@ public class City : BaseEntity
     public int CountryId {  get; set; }
 
     //one to many with Town
+    [JsonIgnore]
     public List<Town>? Towns { get; set; }
 }
