@@ -12,11 +12,11 @@ public class CountryRepository(AppDbContext appDbContext) : IGenericRepositoryIn
     public async Task<GeneralResponse> DeleteById(int id)
     {
         var dep = await appDbContext.Countries.FindAsync(id);
-        if (dep is not null) return NotFound();
+        if (dep is null) return NotFound();
 
         appDbContext.Countries.Remove(dep);
         await Commit();
-        return Success();
+        return DeleteSuccess();
     }
 
     public async Task<List<Country>> GetAll() => await appDbContext.Countries.ToListAsync();
@@ -25,10 +25,10 @@ public class CountryRepository(AppDbContext appDbContext) : IGenericRepositoryIn
 
     public async Task<GeneralResponse> Insert(Country item)
     {
-        if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Departament deja adăugat");
+        if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Țară deja adăugată");
         appDbContext.Countries.Add(item);
         await Commit();
-        return Success();
+        return InsertSuccess();
     }
 
     public async Task<GeneralResponse> Update(Country item)
@@ -37,12 +37,14 @@ public class CountryRepository(AppDbContext appDbContext) : IGenericRepositoryIn
         if (dep is null) return NotFound();
         dep.Name = item.Name;
         await Commit();
-        return Success();
+        return UpdateSuccess();
     }
 
-    private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
+    private static GeneralResponse NotFound() => new(false, "Țară nu a fost găsită");
 
-    private static GeneralResponse Success() => new(true, "Departament adăugat");
+    private static GeneralResponse InsertSuccess() => new(true, "Țară adăugată");
+    private static GeneralResponse DeleteSuccess() => new(true, "Țară ștearsă");
+    private static GeneralResponse UpdateSuccess() => new(true, "Țară modificată");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 

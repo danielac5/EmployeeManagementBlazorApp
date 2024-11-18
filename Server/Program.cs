@@ -55,6 +55,8 @@ builder.Services.AddScoped<IGenericRepositoryInterface<Country>, CountryReposito
 builder.Services.AddScoped<IGenericRepositoryInterface<City>, CityRepository>();
 builder.Services.AddScoped<IGenericRepositoryInterface<Town>, TownRepository>();
 
+builder.Services.AddScoped<IGenericRepositoryInterface<Employee>, EmployeeRepository>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorWasm",

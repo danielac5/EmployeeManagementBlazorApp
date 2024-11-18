@@ -12,11 +12,11 @@ public class DepartmentRepository(AppDbContext appDbContext) : IGenericRepositor
     public async Task<GeneralResponse> DeleteById(int id)
     {
         var dep = await appDbContext.Departments.FindAsync(id);
-        if (dep is not null) return NotFound();
+        if (dep is null) return NotFound();
 
         appDbContext.Departments.Remove(dep);
         await Commit();
-        return Success();
+        return DeleteSuccess();
     }
 
     public async Task<List<Department>> GetAll() => await appDbContext
@@ -31,7 +31,7 @@ public class DepartmentRepository(AppDbContext appDbContext) : IGenericRepositor
         if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Departament deja adăugat");
         appDbContext.Departments.Add(item);
         await Commit();
-        return Success();
+        return InsertSuccess();
     }
 
     public async Task<GeneralResponse> Update(Department item)
@@ -39,13 +39,16 @@ public class DepartmentRepository(AppDbContext appDbContext) : IGenericRepositor
         var dep = await appDbContext.Departments.FindAsync(item.Id);
         if (dep is null) return NotFound();
         dep.Name = item.Name;
+        dep.GeneralDepartmentId = item.GeneralDepartmentId;
         await Commit();
-        return Success();
+        return UpdateSuccess();
     }
 
     private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
 
-    private static GeneralResponse Success() => new(true, "Departament adăugat");
+    private static GeneralResponse InsertSuccess() => new(true, "Departament adăugat");
+    private static GeneralResponse DeleteSuccess() => new(true, "Departament șters");
+    private static GeneralResponse UpdateSuccess() => new(true, "Departament modificat");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 

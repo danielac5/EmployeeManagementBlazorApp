@@ -4,18 +4,16 @@
 
 @inject SfDialogService dialogService
 
-<SfDialog Width="250px" IsModal="true" ShowCloseIcon="true" @bind-Visible=IsVisible>
-
+<SfDialog Width="250px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
     <DialogEvents OnOpen="OpenDialog"> </DialogEvents>
-
     <DialogTemplates>
-        <Header> @Title Department </Header>
+        <Header> @Title Departamente generale </Header>
         <Content>
             <EditForm Model="GeneralDepartment" Enhance OnSubmit="Save">
                 <div class="card border-success">
                     <div class="card-body">
                         <div class="form-group">
-                            <label class="form-label">Name</label>
+                            <label class="form-label">Nume departament</label>
                             <InputText @bind-Value="GeneralDepartment.Name" class="form-control" />
                         </div>
                     </div>
@@ -32,8 +30,10 @@
 @code {
     [Parameter] public GeneralDepartment GeneralDepartment { get; set; } = new();
     [Parameter] public EventCallback<GeneralDepartment> HandleSaveOperationEvent { get; set; }
+
     private bool IsVisible { get; set; } = false;
-    public string Title { get; set; } = "Add";
+    public string Title { get; set; } = "Adaugă";
+
     public void OpenDialog()
     {
         IsVisible = true;
@@ -44,7 +44,6 @@
     {
         if (string.IsNullOrEmpty(GeneralDepartment.Name))
             await dialogService.AlertAsync("Adaugă numele departamentului", "Eroare");
-
         else
             await HandleSaveOperationEvent.InvokeAsync(GeneralDepartment);
     }
@@ -54,4 +53,3 @@
         Title = title;
     }
 }
- 

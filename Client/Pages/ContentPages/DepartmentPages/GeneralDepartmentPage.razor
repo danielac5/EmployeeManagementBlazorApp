@@ -10,9 +10,9 @@
         <div class="row">
             <div class="card">
                 <div class="card-header">
-                    <h4 class="float-start">General Department</h4>
+                    <h4 class="float-start">Departament general</h4>
                     <button class="btn btn-outline-success float-end" @onclick="OpenDialog">
-                        <i class="bi bi-plus-circle-dotted"></i>Add Department
+                        <i class="bi bi-plus-circle-dotted"></i>Adaugă departament
                     </button>
                 </div>
 
@@ -23,8 +23,8 @@
                                 <tr>
                                     <th scope="col">#</th>
                                     <th scope="col">ID</th>
-                                    <th scope="col">General Department</th>
-                                    <th scope="col">Action</th>
+                                    <th scope="col">Departament General</th>
+                                    <th scope="col">Opțiuni</th>
                                 </tr>
                             </thead>
 
@@ -79,7 +79,7 @@
 @code {
     GeneralDepartmentDialog? generalDepartmentDialog;
     GeneralDepartment GeneralDepartment = new();
-    public string Title { get; set; } = "Add";
+    public string Title { get; set; } = "Adaugă";
     public List<GeneralDepartment> GeneralDepartments { get; set; } = new();
 
     protected async override Task OnInitializedAsync()
@@ -119,7 +119,7 @@
         {
             GeneralDepartment = new();
             await GetGeneralDepartments();
-            generalDepartmentDialog?.ChangeTitle("Add");
+            generalDepartmentDialog?.ChangeTitle("Adaugă");
         }
     }
 

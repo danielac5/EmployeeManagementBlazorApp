@@ -1,0 +1,84 @@
+﻿<SfDialog Width="280px" IsModal="true" ShowCloseIcon="true" @bind-Visible="IsVisible">
+    <DialogEvents OnOpen="OpenDialog" /> 
+
+    <DialogTemplates>
+        <Header> Actualizare utilizatori </Header>
+        <Content>
+            <EditForm Model="ManageUser" OnSubmit="Save">
+                <div class="card border-success">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label class="form-label">Nume</label>
+                            <input @bind="ManageUser.Name" class="form-control" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input @bind="ManageUser.Email" class="form-control" />
+                        </div>
+
+                        <div class="form-group mt-3 mb-3">
+                            <label class="form-label">Rol utilizator</label>
+                            @if (string.IsNullOrEmpty(ManageUser!.Role!))
+                            {
+                                string selected = ManageUser!.Role!;
+
+                                <SfDropDownList TValue="string" TItem="SystemRole" Placeholder="@selected" DataSource="SystemRoles">
+                                    <DropDownListFieldSettings Value="Name" Text="Name"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="string" TItem="SystemRole" ValueChange="OnValueChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            }
+                            else
+                            {
+                                <SfDropDownList TValue="string" TItem="SystemRole" Placeholder="Selectează rol" DataSource="SystemRoles">
+                                    <DropDownListFieldSettings Value="Name" Text="Name"></DropDownListFieldSettings>
+                                    <DropDownListEvents TValue="string" TItem="SystemRole" ValueChange="OnValueChange"></DropDownListEvents>
+                                </SfDropDownList>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </EditForm>
+        </Content>
+    </DialogTemplates>
+
+    <DialogButtons>
+        <DialogButton Content="SAVE" Type="ButtonType.Submit" IsPrimary="true" OnClick="Save" />
+    </DialogButtons>
+</SfDialog>
+
+@code {
+    [Parameter] public ManageUser ManageUser { get; set; } = new();
+    [Parameter] public List<SystemRole> SystemRoles { get; set; } = new();
+    [Parameter] public EventCallback<ManageUser> HandleSaveOperationEvent { get; set; }
+
+    private bool IsVisible { get; set; } = false;
+
+    private async void Save()
+    {
+        if (string.IsNullOrEmpty(ManageUser.Name) || string.IsNullOrEmpty(ManageUser.Role))
+            await dialogService.AlertAsync("Introdu rolul de permisiune a utilizatorului", "Eroare");
+        else
+            await HandleSaveOperationEvent.InvokeAsync(ManageUser);
+    }
+
+    public void OpenDialog()
+    {
+        if (SystemRoles == null || SystemRoles.Count == 0)
+        {
+            SystemRoles = new List<SystemRole>
+            {
+                new SystemRole { Name = "Admin" },
+                new SystemRole { Name = "User" }
+            };
+        }
+
+        IsVisible = true;
+        StateHasChanged();
+    }
+
+    public void OnValueChange(ChangeEventArgs<string, SystemRole> args)
+    {
+        ManageUser.Role = args.Value.ToString();
+    }
+}

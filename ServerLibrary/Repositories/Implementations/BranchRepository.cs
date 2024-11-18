@@ -10,38 +10,44 @@ public class BranchRepository(AppDbContext appDbContext) : IGenericRepositoryInt
 {
     public async Task<GeneralResponse> DeleteById(int id)
     {
-        var dep = await appDbContext.Branches.FindAsync(id);
-        if (dep is null) return NotFound();
+        var branch = await appDbContext.Branches.FindAsync(id);
+        if (branch is null) return NotFound();
 
-        appDbContext.Branches.Remove(dep);
+        appDbContext.Branches.Remove(branch);
         await Commit();
-        return Success();
+        return DeleteSuccess();
     }
 
-    public async Task<List<Branch>> GetAll() => await appDbContext.Branches.ToListAsync();
+    public async Task<List<Branch>> GetAll() => await appDbContext.
+        Branches.AsNoTracking().
+        Include(d=>d.Department).
+        ToListAsync();
 
     public async Task<Branch> GetById(int id) => await appDbContext.Branches.FindAsync(id);
 
     public async Task<GeneralResponse> Insert(Branch item)
     {
-        if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Departament adăugat deja");
+        if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Filială adăugată deja");
         appDbContext.Branches.Add(item);
         await Commit();
-        return Success();
+        return InsertSuccess();
     }
 
     public async Task<GeneralResponse> Update(Branch item)
     {
-        var dep = await appDbContext.Branches.FindAsync(item.Id);
-        if (dep is null) return NotFound();
-        dep.Name = item.Name;
+        var branch = await appDbContext.Branches.FindAsync(item.Id);
+        if (branch is null) return NotFound();
+        branch.Name = item.Name;
+        branch.DepartmentId = item.DepartmentId;
         await Commit();
-        return Success();
+        return UpdateSuccess();
     }
 
-    private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
+    private static GeneralResponse NotFound() => new(false, "Filiala nu a fost găsită");
 
-    private static GeneralResponse Success() => new(true, "Departament adăugat");
+    private static GeneralResponse InsertSuccess() => new(true, "Filială adăugată");
+    private static GeneralResponse DeleteSuccess() => new(true, "Filială ștearsă");
+    private static GeneralResponse UpdateSuccess() => new(true, "Filială modificată");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 

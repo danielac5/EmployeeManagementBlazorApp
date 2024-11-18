@@ -6,7 +6,7 @@ namespace BaseLibrary.Entities;
 public class Employee : BaseEntity
 {
     [Required]
-    public string CNP { get; set; } = string.Empty;
+    public string CivilId { get; set; } = string.Empty;
     [Required]
     public string FileNumber { get; set; } = string.Empty;
     [Required]
@@ -23,8 +23,8 @@ public class Employee : BaseEntity
 
     //many to one with Branch
     public Branch? Branch { get; set; }
-    public int BranchId { get; set; }
+    public int? BranchId { get; set; }
     public Town? Town { get; set; }
-    public int TownId { get; set; }
+    public int? TownId { get; set; }
 
 }

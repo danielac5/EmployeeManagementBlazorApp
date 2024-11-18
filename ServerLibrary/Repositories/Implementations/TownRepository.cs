@@ -16,33 +16,40 @@ public class TownRepository(AppDbContext appDbContext) : IGenericRepositoryInter
 
         appDbContext.Towns.Remove(dep);
         await Commit();
-        return Success();
+        return DeleteSuccess();
     }
 
-    public async Task<List<Town>> GetAll() => await appDbContext.Towns.ToListAsync();
+    public async Task<List<Town>> GetAll() => await appDbContext
+        .Towns
+        .AsNoTracking()
+        .Include(c => c.City)
+        .ToListAsync();
 
     public async Task<Town> GetById(int id) => await appDbContext.Towns.FindAsync(id);
 
     public async Task<GeneralResponse> Insert(Town item)
     {
-        if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Departament adăugat deja");
+        if (!await CheckName(item.Name!)) return new GeneralResponse(false, "Localitate adăugată deja");
         appDbContext.Towns.Add(item);
         await Commit();
-        return Success();
+        return InsertSuccess();
     }
 
     public async Task<GeneralResponse> Update(Town item)
     {
-        var dep = await appDbContext.Towns.FindAsync(item.Id);
-        if (dep is null) return NotFound();
-        dep.Name = item.Name;
+        var town = await appDbContext.Towns.FindAsync(item.Id);
+        if (town is null) return NotFound();
+        town.Name = item.Name;
+        town.CityId = item.CityId;
         await Commit();
-        return Success();
+        return UpdateSuccess();
     }
 
-    private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
+    private static GeneralResponse NotFound() => new(false, "Localitate nu a fost găsită");
 
-    private static GeneralResponse Success() => new(true, "Departament adăugat");
+    private static GeneralResponse InsertSuccess() => new(true, "Localitate adăugată");
+    private static GeneralResponse DeleteSuccess() => new(true, "Localitate ștearsă");
+    private static GeneralResponse UpdateSuccess() => new(true, "Localitate modificată");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 

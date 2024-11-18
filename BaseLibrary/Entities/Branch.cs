@@ -10,5 +10,5 @@ public class Branch : BaseEntity
 
     //relationship one to many with Employee
     [JsonIgnore]
-    public List<Employee> Employees { get; set; }
+    public List<Employee>? Employees { get; set; }
 }

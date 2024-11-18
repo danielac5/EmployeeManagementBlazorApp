@@ -1,9 +1,11 @@
 ﻿
 using BaseLibrary.DTO;
+using BaseLibrary.Entities;
 using BaseLibrary.Responses;
 using ClientLibrary.Helpers;
 using ClientLibrary.Services.Contracts;
 using System.Net.Http.Json;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace ClientLibrary.Services.Implementations;
 
@@ -41,12 +43,40 @@ public class UserAccountService(GetHttpClient getHttpClient) : IUserAccountServi
         return await result.Content.ReadFromJsonAsync<LoginResponse>()!;
     }
 
-
-    public async Task<WeatherForecast[]> GetWeatherForecast()
+    public async Task<List<ManageUser>> GetUsers()
     {
         var httpClient = await getHttpClient.GetPrivateHttpClient();
-        var result = await httpClient.GetFromJsonAsync<WeatherForecast[]>("api/weatherforecast");
+        var result = await httpClient.GetFromJsonAsync<List<ManageUser>>($"{AuthUrl}/users");
         return result!;
     }
 
+    public async Task<GeneralResponse> UpdateUser(ManageUser user)
+    {
+        var httpClient = getHttpClient.GetPublicHttpClient();
+        var result = await httpClient.PutAsJsonAsync($"{AuthUrl}/update-user", user);
+
+        if (!result.IsSuccessStatusCode) return new GeneralResponse(false, "A apărut o eroare");
+
+        return await result.Content.ReadFromJsonAsync<GeneralResponse>()!;
+
+    }
+
+    public async Task<List<SystemRole>> GetRoles()
+    {
+        var httpClient = await getHttpClient.GetPrivateHttpClient();
+        var result = await httpClient.GetFromJsonAsync<List<SystemRole>>($"{AuthUrl}/roles");
+
+        return result!;
+    }
+
+    public async Task<GeneralResponse> DeleteUser(int id)
+    {
+        var httpClient = await getHttpClient.GetPrivateHttpClient();
+        var result = await httpClient.DeleteAsync($"{AuthUrl}/delete-user/{id}");
+
+        if (!result.IsSuccessStatusCode) return new GeneralResponse(false, "A apărut o eroare");
+
+        return await result.Content.ReadFromJsonAsync<GeneralResponse>();
+
+    }
 }

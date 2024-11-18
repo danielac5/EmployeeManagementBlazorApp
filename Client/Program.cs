@@ -16,7 +16,7 @@ using Syncfusion.Licensing;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-SyncfusionLicenseProvider.RegisterLicense("MzU2MjMyMkAzMjM3MmUzMDJlMzBMalUvRDVmMjllaDZIUWtiNHVxdGdRdTl5SlZTSzhRYUZNMG9rQ2NHcDVVPQ== ");
+SyncfusionLicenseProvider.RegisterLicense("MzU2MjMyMkAzMjM3MmUzMDJlMzBMalUvRDVmMjllaDZIUWtiNHVxdGdRdTl5SlZTSzhRYUZNMG9rQ2NHcDVVPQ==");
 
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");

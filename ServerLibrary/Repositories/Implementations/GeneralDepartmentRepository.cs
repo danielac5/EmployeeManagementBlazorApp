@@ -27,7 +27,7 @@ public class GeneralDepartmentRepository(AppDbContext appDbContext) : IGenericRe
     {
         var checkIfNull = await CheckName(item.Name);
         if (!checkIfNull) 
-            return new GeneralResponse(false, "Departament General deja adăugat");
+            return new GeneralResponse(false, "Departament general deja adăugat");
         appDbContext.GeneralDepartments.Add(item);
         await Commit();
         return InsertSuccess();
@@ -42,11 +42,11 @@ public class GeneralDepartmentRepository(AppDbContext appDbContext) : IGenericRe
         return UpdateSuccess();
     }
 
-    private static GeneralResponse NotFound() => new(false, "Departamentul nu a fost găsit");
+    private static GeneralResponse NotFound() => new(false, "Departamentul general nu a fost găsit");
 
-    private static GeneralResponse DeleteSuccess() => new(true, "Departament șters");
-    private static GeneralResponse InsertSuccess() => new(true, "Departament adăugat");
-    private static GeneralResponse UpdateSuccess() => new(true, "Modificări aplicate");
+    private static GeneralResponse DeleteSuccess() => new(true, "Departament general șters");
+    private static GeneralResponse InsertSuccess() => new(true, "Departament general adăugat");
+    private static GeneralResponse UpdateSuccess() => new(true, "Departament general modificat");
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 
