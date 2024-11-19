@@ -1,8 +1,6 @@
 ﻿
 using BaseLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
 
 namespace ServerLibrary.Data;
 

@@ -4,7 +4,6 @@
 @using Syncfusion.Blazor
 @using Syncfusion.Blazor.Grids
 
-
 @if (allState.ShowEmployee)
 {
     if (ShowMainPage)
@@ -15,31 +14,30 @@
                     <div class="card">
                         <div class="card-header">
                             <button class="btn btn-outline-success" @onclick="ShowAddOrUpdateEmployeeButtonClicked">
-                                <i class="bi bi-plus-circle-dotted"></i> Adaugă angajat 
+                                <i class="bi bi-plus-circle-dotted"></i> Adaugă angajat
                             </button>
                         </div>
                         <div class="card-body">
                             <SfGrid DataSource="@Employees">
                                 <GridColumns>
-                                    <GridColumn HeaderText="Employee Image">
+                                    <GridColumn HeaderText="Employee.Image">
                                         <Template>
-                                            @{
-                                                var employee = (context as Employee);
-                                                <div class="image">
-                                                    <img src="@employee?.Photo" alt="@employee?.Name" width="150" height="150" />
-                                                </div>
-                                            }
+                                            @context
+                                            <div class="image">
+                                                <img src="Employee.Photo" alt="Employee.Name" width="150" height="150" />
+                                            </div>
                                         </Template>
                                     </GridColumn>
-                                    <GridColumn Field=@nameof(Employee.CivilId) HeaderText="Civil ID"></GridColumn>
-                                    <GridColumn Field=@nameof(Employee.FileNumber) HeaderText="File Number"></GridColumn>
-                                    <GridColumn Field=@nameof(Employee.Name) HeaderText="Name"></GridColumn>
-                                    <GridColumn Field=@nameof(Employee.TelephoneNumber) HeaderText="Telephone"></GridColumn>
-                                    <GridColumn Field=@nameof(Employee.JobName) HeaderText="Job Name"></GridColumn>
-                                    <GridColumn Field=@nameof(Employee.Branch.Name) HeaderText="Branch"></GridColumn>
-                                    <GridColumn Field=@nameof(Employee.Town.Name) HeaderText="Town"></GridColumn>
+                                    <GridColumn Field=@nameof(Employee.CivilId) HeaderText="Civil ID"> </GridColumn>
+                                    <GridColumn Field=@nameof(Employee.FileNumber) HeaderText="File Number"> </GridColumn>
+                                    <GridColumn Field=@nameof(Employee.Name) HeaderText="Name"> </GridColumn>
+                                    <GridColumn Field=@nameof(Employee.TelephoneNumber) HeaderText="Telephone"> </GridColumn>
+                                    <GridColumn Field=@nameof(Employee.JobName) HeaderText="Job Name"> </GridColumn>
+                                    <GridColumn Field=@nameof(Employee.Branch.Name) HeaderText="Branch"> </GridColumn>
+                                    <GridColumn Field=@nameof(Employee.Town.Name) HeaderText="Town"> </GridColumn>
                                 </GridColumns>
                             </SfGrid>
+
                         </div>
                         <div class="card-footer">
                         </div>
@@ -50,7 +48,7 @@
     }
 }
 
-<ManageEmployeePage ShowAddOrUpdateEmployee="ShowAddOrUpdatePage" />
+<AddOrUpdateEmployeePage ShowAddOrUpdateEmployee="ShowAddOrUpdatePage" />
 
 @code {
     public List<Employee> Employees { get; set; } = new();
