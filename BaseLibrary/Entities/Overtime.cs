@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BaseLibrary.Entities;
 
-public class Overtime : OtheBaseEntity
+public class Overtime : OtherBaseEntity
 {
     [Required] public DateTime StartDate { get; set; }
     [Required] public DateTime EndDate { get; private set; }

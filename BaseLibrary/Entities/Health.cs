@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BaseLibrary.Entities;
 
-public class Health : OtheBaseEntity
+public class Health : OtherBaseEntity
 {
     [Required] public DateTime Date { get; set; }
     [Required] public string MedicalDiagnose { get; set; } = string.Empty;

@@ -3,7 +3,7 @@
 public class AllState
 {
     //scope action
-    public Action? Action { get; set; } 
+    public Action? Action { get; set; }
 
     //general department
     public bool ShowGeneralDepartment { get; set; }
@@ -76,7 +76,7 @@ public class AllState
         ShowEmployee = true;
         Action?.Invoke();
     }
-     
+
     private void ResetAllDepartments()
     {
         ShowGeneralDepartment = false;
@@ -89,4 +89,3 @@ public class AllState
         ShowEmployee = false;
     }
 }
- 

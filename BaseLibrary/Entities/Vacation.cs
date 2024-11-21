@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BaseLibrary.Entities;
 
-public class Vacation : OtheBaseEntity
+public class Vacation : OtherBaseEntity
 {
     [Required] public DateTime StartDate { get; set; }
     [Required] public int NumberOfDays { get; set; }

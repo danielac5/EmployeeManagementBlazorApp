@@ -1,12 +1,9 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
-<CascadingAuthenticationState>
-
+﻿@using Client.Layout
 <Router AppAssembly="@typeof(App).Assembly">
     <Found Context="routeData">
-        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" >
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <Authorizing>Așteptați un moment...</Authorizing>
-            </AuthorizeRouteView>
-        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </AuthorizeRouteView>
     </Found>
     <NotFound>
         <PageTitle>Not found</PageTitle>
@@ -15,4 +12,3 @@
         </LayoutView>
     </NotFound>
 </Router>
-</CascadingAuthenticationState>

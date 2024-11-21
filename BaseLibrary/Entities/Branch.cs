@@ -4,9 +4,9 @@ namespace BaseLibrary.Entities;
 
 public class Branch : BaseEntity
 {
-    //relationships many to one with Department
-    public Department? Department { get; set; }
-    public int DepartmentId { get; set; }
+    //relationships many to one with general department
+    public GeneralDepartment? GeneralDepartment { get; set; }
+    public int GeneralDepartmentId { get; set; }
 
     //relationship one to many with Employee
     [JsonIgnore]

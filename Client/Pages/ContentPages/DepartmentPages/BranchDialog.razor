@@ -20,10 +20,10 @@
                         <div class="form-group mt-3 mb-3">
                             <label class="form-label">Selectează departament</label>
 
-                            <SfDropDownList TValue="int" TItem="Department"
+                            <SfDropDownList TValue="int" TItem="GeneralDepartment"
                                             Placeholder="Selectează un departament"
-                                            DataSource="Departments"
-                                            @bind-Value="Branch.DepartmentId">
+                                            DataSource="GeneralDepartments"
+                                            @bind-Value="Branch.GeneralDepartmentId">
                                 <DropDownListFieldSettings Value="Id" Text="Name"></DropDownListFieldSettings>
                             </SfDropDownList>
                         </div>
@@ -40,7 +40,7 @@
 
 @code {
     [Parameter] public Branch Branch { get; set; } = new();
-    [Parameter] public List<Department> Departments { get; set; } = new();
+    [Parameter] public List<GeneralDepartment> GeneralDepartments { get; set; } = new();
     [Parameter] public EventCallback<Branch> HandleSaveOperationEvent { get; set; }
 
     private bool IsVisible { get; set; } = false;
@@ -48,7 +48,7 @@
 
     private async void Save()
     {
-        if (string.IsNullOrEmpty(Branch.Name) || Branch.DepartmentId <= 0)
+        if (string.IsNullOrEmpty(Branch.Name) || Branch.GeneralDepartmentId <= 0)
         {
             await dialogService.AlertAsync("Adaugă numele departamentului", "Eroare!");
         }

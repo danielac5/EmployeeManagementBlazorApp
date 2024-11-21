@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ServerLibrary.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class First : Migration
+    public partial class first : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -27,7 +27,7 @@ namespace ServerLibrary.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Country",
+                name: "Countries",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -36,7 +36,7 @@ namespace ServerLibrary.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Country", x => x.Id);
+                    table.PrimaryKey("PK_Countries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -90,7 +90,7 @@ namespace ServerLibrary.Data.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Token = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<int>(type: "int", nullable: false)
+                    UserId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -151,7 +151,7 @@ namespace ServerLibrary.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "City",
+                name: "Cities",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -161,11 +161,31 @@ namespace ServerLibrary.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_City", x => x.Id);
+                    table.PrimaryKey("PK_Cities", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_City_Country_CountryId",
+                        name: "FK_Cities_Countries_CountryId",
                         column: x => x.CountryId,
-                        principalTable: "Country",
+                        principalTable: "Countries",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Branches",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    GeneralDepartmentId = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Branches", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Branches_GeneralDepartments_GeneralDepartmentId",
+                        column: x => x.GeneralDepartmentId,
+                        principalTable: "GeneralDepartments",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -275,29 +295,9 @@ namespace ServerLibrary.Data.Migrations
                 {
                     table.PrimaryKey("PK_Towns", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Towns_City_CityId",
+                        name: "FK_Towns_Cities_CityId",
                         column: x => x.CityId,
-                        principalTable: "City",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Branches",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Branches", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Branches_Departments_DepartmentId",
-                        column: x => x.DepartmentId,
-                        principalTable: "Departments",
+                        principalTable: "Cities",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -316,8 +316,8 @@ namespace ServerLibrary.Data.Migrations
                     TelephoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Photo = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Other = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    BranchId = table.Column<int>(type: "int", nullable: false),
-                    TownId = table.Column<int>(type: "int", nullable: false),
+                    BranchId = table.Column<int>(type: "int", nullable: true),
+                    TownId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -327,24 +327,22 @@ namespace ServerLibrary.Data.Migrations
                         name: "FK_Employees_Branches_BranchId",
                         column: x => x.BranchId,
                         principalTable: "Branches",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Employees_Towns_TownId",
                         column: x => x.TownId,
                         principalTable: "Towns",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Branches_DepartmentId",
+                name: "IX_Branches_GeneralDepartmentId",
                 table: "Branches",
-                column: "DepartmentId");
+                column: "GeneralDepartmentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_City_CountryId",
-                table: "City",
+                name: "IX_Cities_CountryId",
+                table: "Cities",
                 column: "CountryId");
 
             migrationBuilder.CreateIndex(
@@ -390,6 +388,9 @@ namespace ServerLibrary.Data.Migrations
                 name: "ApplicationUsers");
 
             migrationBuilder.DropTable(
+                name: "Departments");
+
+            migrationBuilder.DropTable(
                 name: "Employees");
 
             migrationBuilder.DropTable(
@@ -429,16 +430,13 @@ namespace ServerLibrary.Data.Migrations
                 name: "VacationTypes");
 
             migrationBuilder.DropTable(
-                name: "Departments");
-
-            migrationBuilder.DropTable(
-                name: "City");
-
-            migrationBuilder.DropTable(
                 name: "GeneralDepartments");
 
             migrationBuilder.DropTable(
-                name: "Country");
+                name: "Cities");
+
+            migrationBuilder.DropTable(
+                name: "Countries");
         }
     }
 }

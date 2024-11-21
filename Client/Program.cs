@@ -16,6 +16,7 @@ using Syncfusion.Licensing;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
+SyncfusionLicenseProvider.RegisterLicense("MzU2MjMyMkAzMjM3MmUzMDJlMzBMalUvRDVmMjllaDZIUWtiNHVxdGdRdTl5SlZTSzhRYUZNMG9rQ2NHcDVVPQ== ");
 SyncfusionLicenseProvider.RegisterLicense("MzU2MjMyMkAzMjM3MmUzMDJlMzBMalUvRDVmMjllaDZIUWtiNHVxdGdRdTl5SlZTSzhRYUZNMG9rQ2NHcDVVPQ==");
 
 builder.RootComponents.Add<App>("#app");
@@ -42,7 +43,7 @@ builder.Services.AddScoped<IGenericServiceInterface<Branch>, GenericServiceImple
 
 // Country / City / Town
 builder.Services.AddScoped<IGenericServiceInterface<Country>, GenericServiceImplementation<Country>>();
-builder.Services.AddScoped<IGenericServiceInterface<City>, GenericServiceImplementation<City>>(); 
+builder.Services.AddScoped<IGenericServiceInterface<City>, GenericServiceImplementation<City>>();
 builder.Services.AddScoped<IGenericServiceInterface<Town>, GenericServiceImplementation<Town>>();
 
 // Employee

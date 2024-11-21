@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BaseLibrary.Entities;
 
-public  class OtheBaseEntity
+public  class OtherBaseEntity
 {
     public int Id { get; set; }
     [Required]

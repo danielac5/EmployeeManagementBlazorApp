@@ -12,14 +12,27 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-public class UserAccountRepository(IOptions<JwtSection> config, AppDbContext appDbContext) : IUserAccount
+public class UserAccountRepository : IUserAccount
 {
+    private readonly IOptions<JwtSection> _config;
+    private readonly AppDbContext _appDbContext;
+
+    public UserAccountRepository(IOptions<JwtSection> config, AppDbContext appDbContext)
+    {
+        _config = config ?? throw new ArgumentNullException(nameof(config));
+        _appDbContext = appDbContext ?? throw new ArgumentNullException(nameof(appDbContext));
+    }
+
+    public async Task<List<SystemRole>> GetRoles()
+    {
+        var roles = await _appDbContext.SystemRoles.ToListAsync();
+        return roles;
+    }
+
+
     public async Task<GeneralResponse> CreateAsync(Register user)
     {
-        if (user is null)
-        {
-            return new GeneralResponse(false, "Modelul este gol");
-        }
+        ArgumentNullException.ThrowIfNull(user);
 
         var checkUser = await FindUserByEmail(user.Email!);
         if (checkUser != null)
@@ -36,7 +49,7 @@ public class UserAccountRepository(IOptions<JwtSection> config, AppDbContext app
         });
 
         // Check, create, assign role
-        var checkAdminRole = await appDbContext.SystemRoles.FirstOrDefaultAsync(_ => _.Name!.Equals(Constants.Admin));
+        var checkAdminRole = await _appDbContext.SystemRoles.FirstOrDefaultAsync(r => r.Name!.Equals(Constants.Admin));
         if (checkAdminRole is null)
         {
             var createAdminRole = await AddToDatabase(new SystemRole() { Name = Constants.Admin });
@@ -44,11 +57,10 @@ public class UserAccountRepository(IOptions<JwtSection> config, AppDbContext app
             return new GeneralResponse(true, "Cont creat cu succes");
         }
 
-        var checkUserRole = await appDbContext.SystemRoles.FirstOrDefaultAsync(_ => _.Name!.Equals(Constants.User));
-        SystemRole response = new();
+        var checkUserRole = await _appDbContext.SystemRoles.FirstOrDefaultAsync(r => r.Name!.Equals(Constants.User));
         if (checkUserRole is null)
         {
-            response = await AddToDatabase(new SystemRole() { Name = Constants.User });
+            var response = await AddToDatabase(new SystemRole() { Name = Constants.User });
             await AddToDatabase(new UserRole() { RoleId = response.Id, UserId = applicationUser.Id });
         }
         else
@@ -60,7 +72,7 @@ public class UserAccountRepository(IOptions<JwtSection> config, AppDbContext app
 
     public async Task<LoginResponse> SignInAsync(Login user)
     {
-        if (user is null) return new LoginResponse(false, "Modelul este gol");
+        ArgumentNullException.ThrowIfNull(user);
 
         var applicationUser = await FindUserByEmail(user.Email!);
         if (applicationUser is null) return new LoginResponse(false, "Utilizatorul nu a fost găsit");
@@ -79,11 +91,11 @@ public class UserAccountRepository(IOptions<JwtSection> config, AppDbContext app
         string refreshToken = GenerateRefreshToken();
 
         // Save the refreshToken to the database
-        var findUser = await appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(_ => _.UserId == applicationUser.Id);
+        var findUser = await _appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(r => r.UserId == applicationUser.Id);
         if (findUser is not null)
         {
             findUser!.Token = refreshToken;
-            await appDbContext.SaveChangesAsync();
+            await _appDbContext.SaveChangesAsync();
         }
         else
         {
@@ -94,76 +106,70 @@ public class UserAccountRepository(IOptions<JwtSection> config, AppDbContext app
 
     private string GenerateToken(ApplicationUser user, string role)
     {
-        if (role == null)
-        {
-            throw new ArgumentNullException(nameof(role)!, "Câmpul rol nu poate fi ul");
-        }
+        ArgumentNullException.ThrowIfNull(role);
 
-        if (config.Value.Key == null)
-        {
-            throw new ArgumentNullException(nameof(config.Value.Key)!, "Cheia JWT nu poate fi nul");
-        }
+        var key = _config.Value.Key ?? throw new ArgumentNullException(nameof(_config.Value.Key), "Cheia JWT nu poate fi nul");
 
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config.Value.Key!));
+        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
         var userClaims = new[]
         {
             new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim(ClaimTypes.Name, user.FullName!),
             new Claim(ClaimTypes.Email, user.Email!),
-            new Claim(ClaimTypes.Role, role!)
+            new Claim(ClaimTypes.Role, role)
         };
 
         var token = new JwtSecurityToken(
-            issuer: config.Value.Issuer,
-            audience: config.Value.Audience,
+            issuer: _config.Value.Issuer,
+            audience: _config.Value.Audience,
             claims: userClaims,
-            expires: DateTime.Now.AddSeconds(2),
+            expires: DateTime.Now.AddMinutes(30),
             signingCredentials: credentials
         );
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    private async Task<UserRole> FindUserRole(int userId) =>
-        await appDbContext.UserRoles.FirstOrDefaultAsync(_ => _.UserId == userId);
+    private async Task<UserRole?> FindUserRole(int userId) =>
+        await _appDbContext.UserRoles.FirstOrDefaultAsync(r => r.UserId == userId);
 
-    private async Task<SystemRole> FindRoleName(int roleId) =>
-        await appDbContext.SystemRoles.FirstOrDefaultAsync(_ => _.Id == roleId);
+    private async Task<SystemRole?> FindRoleName(int roleId) =>
+        await _appDbContext.SystemRoles.FirstOrDefaultAsync(r => r.Id == roleId);
 
     private static string GenerateRefreshToken() => Convert.ToBase64String(RandomNumberGenerator.GetBytes(64));
 
-    private async Task<ApplicationUser> FindUserByEmail(string email) =>
-        await appDbContext.ApplicationUsers.FirstOrDefaultAsync(_ => _.Email!.ToLower()!.Equals(email!.ToLower()));
+    private async Task<ApplicationUser?> FindUserByEmail(string email) =>
+        await _appDbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.Email!.ToLower() == email.ToLower());
 
-    private async Task<T> AddToDatabase<T>(T model)
+    private async Task<T> AddToDatabase<T>(T model) where T : class
     {
-        var result = appDbContext.Add(model!);
-        await appDbContext.SaveChangesAsync();
-        return (T)result.Entity;
+        var result = _appDbContext.Add(model);
+        await _appDbContext.SaveChangesAsync();
+        return result.Entity;
     }
 
     public async Task<LoginResponse> RefreshTokenAsync(RefreshToken token)
     {
-        if (token is null) return new LoginResponse(false, "Modelul este gol");
+        ArgumentNullException.ThrowIfNull(token);
 
-        var findToken = await appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(_ => _.Token!.Equals(token.Token));
+        var findToken = await _appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(r => r.Token == token.Token);
         if (findToken is null) return new LoginResponse(false, "Refresh token necesar");
 
         // Get user details
-        var user = await appDbContext.ApplicationUsers.FirstOrDefaultAsync(_ => _.Id == findToken.UserId);
+        var user = await _appDbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == findToken.UserId);
         if (user is null) return new LoginResponse(false, "Token-ul nu a putut fi generat deoarece utilizatorul nu a fost găsit");
 
         var userRole = await FindUserRole(user.Id);
-        var roleName = await FindRoleName(userRole.RoleId);
-        string jwtToken = GenerateToken(user, roleName.Name!);
+        var roleName = await FindRoleName(userRole!.RoleId);
+        string jwtToken = GenerateToken(user, roleName!.Name!);
         string refreshToken = GenerateRefreshToken();
 
-        // Check if the refreshToken table contains the specific infos
-        var updateRefreshToken = await appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(_ => _.UserId == user.Id);
+        // Update the refresh token
+        var updateRefreshToken = await _appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(r => r.UserId == user.Id);
         if (updateRefreshToken is null) return new LoginResponse(false, "Token-ul nu a putut fi generat deoarece utilizatorul nu este autentificat");
 
         updateRefreshToken.Token = refreshToken;
-        await appDbContext.SaveChangesAsync();
+        await _appDbContext.SaveChangesAsync();
         return new LoginResponse(true, "Token reîmprospătat cu succes", jwtToken, refreshToken);
     }
 
@@ -173,63 +179,48 @@ public class UserAccountRepository(IOptions<JwtSection> config, AppDbContext app
         var allUserRoles = await UserRoles();
         var allRoles = await SystemRoles();
 
-        if (allUsers.Count == 0 || allRoles.Count == 0) return new List<ManageUser>(); // Return empty list instead of null
-        var users = new List<ManageUser>();
+        if (!allUsers.Any() || !allRoles.Any()) return new List<ManageUser>();
 
-        foreach (var user in allUsers)
-        {
-            var userRole = allUserRoles.FirstOrDefault(u => u.UserId == user.Id);
-            if (userRole == null) continue; // Skip if user role is null
-            var roleName = allRoles.FirstOrDefault(r => r.Id == userRole.RoleId);
-            if (roleName == null) continue; // Skip if role name is null
-
-            users.Add(new ManageUser() { UserId = user.Id, Name = user.FullName!, Email = user.Email!, Role = roleName.Name! });
-        }
+        var users = allUsers
+            .Join(allUserRoles, user => user.Id, userRole => userRole.UserId, (user, userRole) => new { user, userRole })
+            .Join(allRoles, ur => ur.userRole.RoleId, role => role.Id, (ur, role) => new ManageUser
+            {
+                UserId = ur.user.Id,
+                Name = ur.user.FullName!,
+                Email = ur.user.Email!,
+                Role = role.Name!
+            })
+            .ToList();
 
         return users;
     }
 
     public async Task<GeneralResponse> UpdateUser(ManageUser user)
     {
-        var getRole = (await SystemRoles()).FirstOrDefault(r => r.Name!.Equals(user.Role));
-        if (getRole == null) return new GeneralResponse(false, "Rolul nu a fost găsit");
+        var getRole = await _appDbContext.SystemRoles.FirstOrDefaultAsync(r => r.Name!.ToLower().Equals(user.Role.ToLower()));
+        if (getRole is null) return new GeneralResponse(false, "Rolul nu există în baza de date");
 
-        var userRole = await appDbContext.UserRoles.FirstOrDefaultAsync(u => u.UserId == user.UserId);
-        if (userRole == null) return new GeneralResponse(false, "Rolul utilizatorului nu a fost găsit");
+        var userRole = await _appDbContext.UserRoles.FirstOrDefaultAsync(u => u.UserId == user.UserId);
+        if (userRole is null) return new GeneralResponse(false, "Utilizatorul nu există în baza de date");
 
         userRole.RoleId = getRole.Id;
-        await appDbContext.SaveChangesAsync();
-        return new GeneralResponse(true, "Rolul utilizatorului a fost modificat cu succes");
+        await _appDbContext.SaveChangesAsync();
+        return new GeneralResponse(true, "Datele utilizatorului au fost actualizate");
     }
 
-    public async Task<List<SystemRole>> GetRoles() => await SystemRoles();
-
-    public async Task<GeneralResponse> DeleteUser(int id)
+    public async Task<GeneralResponse> DeleteUser(int userId)
     {
-        var getUser = await appDbContext.ApplicationUsers.FirstOrDefaultAsync(_ => _.Id == id);
-        if (getUser == null) return new GeneralResponse(false, "Utilizatorul nu a fost găsit");
+        var getUser = await _appDbContext.ApplicationUsers.FirstOrDefaultAsync(u => u.Id == userId);
+        if (getUser is null) return new GeneralResponse(false, "Utilizatorul nu există în baza de date");
 
-        var getUserRole = await appDbContext.UserRoles.FirstOrDefaultAsync(_ => _.UserId == id);
-        if (getUserRole == null) return new GeneralResponse(false, "Rolul utilizatorului nu a fost găsit");
-
-        var getRefreshToken = await appDbContext.RefreshTokenInfos.FirstOrDefaultAsync(_ => _.UserId == id);
-        if (getRefreshToken == null) return new GeneralResponse(false, "Refresh token-ul nu a fost găsit");
-
-        appDbContext.ApplicationUsers.Remove(getUser);
-        appDbContext.UserRoles.Remove(getUserRole);
-        appDbContext.RefreshTokenInfos.Remove(getRefreshToken);
-        await appDbContext.SaveChangesAsync();
-
-        return new GeneralResponse(true, "Utilizatorul a fost șters cu succes");
+        _appDbContext.ApplicationUsers.Remove(getUser);
+        await _appDbContext.SaveChangesAsync();
+        return new GeneralResponse(true, "Utilizatorul a fost eliminat");
     }
 
-    // Helper methods to retrieve lists
-    private async Task<List<ApplicationUser>> GetApplicationUsers() =>
-        await appDbContext.ApplicationUsers.ToListAsync();
+    private async Task<List<ApplicationUser>> GetApplicationUsers() => await _appDbContext.ApplicationUsers.ToListAsync();
 
-    private async Task<List<SystemRole>> SystemRoles() =>
-        await appDbContext.SystemRoles.ToListAsync();
+    private async Task<List<UserRole>> UserRoles() => await _appDbContext.UserRoles.ToListAsync();
 
-    private async Task<List<UserRole>> UserRoles() =>
-        await appDbContext.UserRoles.ToListAsync();
+    private async Task<List<SystemRole>> SystemRoles() => await _appDbContext.SystemRoles.ToListAsync();
 }

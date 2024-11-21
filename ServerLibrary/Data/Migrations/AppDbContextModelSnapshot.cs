@@ -17,7 +17,7 @@ namespace ServerLibrary.Data.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
+                .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -52,7 +52,7 @@ namespace ServerLibrary.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("DepartmentId")
+                    b.Property<int>("GeneralDepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -61,7 +61,7 @@ namespace ServerLibrary.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DepartmentId");
+                    b.HasIndex("GeneralDepartmentId");
 
                     b.ToTable("Branches");
                 });
@@ -139,7 +139,7 @@ namespace ServerLibrary.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("BranchId")
+                    b.Property<int?>("BranchId")
                         .HasColumnType("int");
 
                     b.Property<string>("CivilId")
@@ -173,7 +173,7 @@ namespace ServerLibrary.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("TownId")
+                    b.Property<int?>("TownId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -300,7 +300,7 @@ namespace ServerLibrary.Data.Migrations
                     b.Property<string>("Token")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -478,13 +478,13 @@ namespace ServerLibrary.Data.Migrations
 
             modelBuilder.Entity("BaseLibrary.Entities.Branch", b =>
                 {
-                    b.HasOne("BaseLibrary.Entities.Department", "Department")
+                    b.HasOne("BaseLibrary.Entities.GeneralDepartment", "GeneralDepartment")
                         .WithMany("Branches")
-                        .HasForeignKey("DepartmentId")
+                        .HasForeignKey("GeneralDepartmentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Department");
+                    b.Navigation("GeneralDepartment");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.City", b =>
@@ -513,15 +513,11 @@ namespace ServerLibrary.Data.Migrations
                 {
                     b.HasOne("BaseLibrary.Entities.Branch", "Branch")
                         .WithMany("Employees")
-                        .HasForeignKey("BranchId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BranchId");
 
                     b.HasOne("BaseLibrary.Entities.Town", "Town")
                         .WithMany("Employeses")
-                        .HasForeignKey("TownId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("TownId");
 
                     b.Navigation("Branch");
 
@@ -531,7 +527,7 @@ namespace ServerLibrary.Data.Migrations
             modelBuilder.Entity("BaseLibrary.Entities.Overtime", b =>
                 {
                     b.HasOne("BaseLibrary.Entities.OvertimeType", "OvertimeType")
-                        .WithMany()
+                        .WithMany("Overtimes")
                         .HasForeignKey("OvertimeTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -583,14 +579,16 @@ namespace ServerLibrary.Data.Migrations
                     b.Navigation("Cities");
                 });
 
-            modelBuilder.Entity("BaseLibrary.Entities.Department", b =>
-                {
-                    b.Navigation("Branches");
-                });
-
             modelBuilder.Entity("BaseLibrary.Entities.GeneralDepartment", b =>
                 {
+                    b.Navigation("Branches");
+
                     b.Navigation("Departments");
+                });
+
+            modelBuilder.Entity("BaseLibrary.Entities.OvertimeType", b =>
+                {
+                    b.Navigation("Overtimes");
                 });
 
             modelBuilder.Entity("BaseLibrary.Entities.SanctionType", b =>

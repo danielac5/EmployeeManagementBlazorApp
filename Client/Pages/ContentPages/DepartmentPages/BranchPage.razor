@@ -1,4 +1,5 @@
-﻿@implements IDisposable
+﻿@using ClientCommon.Helpers
+@implements IDisposable
 
 @if (allState.ShowBranch)
 {
@@ -20,7 +21,7 @@
                                     <tr>
                                         <th scope="col">#</th>
                                         <th scope="col">ID</th>
-                                        <th scope="col">Departament</th>
+                                        <th scope="col">Departament general</th>
                                         <th scope="col">Filială</th>
                                         <th scope="col">Opțiuni</th>
                                     </tr>
@@ -35,7 +36,7 @@
                                             <tr>
                                                 <th scope="row">@count</th>
                                                 <td>@item.Id</td>
-                                                <td>@item.Department!.Name</td>
+                                                <td>@item.GeneralDepartment!.Name</td>
                                                 <td>@item.Name</td>
                                                 <td>
                                                     <i class="bi bi-pencil text-info cursorStyle" @onclick="()=>EditClicked(item)"></i>
@@ -64,19 +65,19 @@
 <BranchDialog @ref="branchDialog"
               HandleSaveOperationEvent="HandleSaveOperationEvent"
               Branch="Branch"
-              Departments="Departments" />
+              GeneralDepartments="GeneralDepartments" />
 
 @code {
     public string Title { get; set; } = "Adaugă";
     BranchDialog? branchDialog;
     Branch Branch = new();
-    public List<Department> Departments { get; set; } = new();
+    public List<GeneralDepartment> GeneralDepartments { get; set; } = new();
     public List<Branch> Branches { get; set; } = new();
 
     protected async override Task OnInitializedAsync()
     {
         await GetBranches();
-        await GetDepartments();
+        await GetGeneralDepartments();
         allState.Action += StateHasChanged;
     }
 
@@ -85,9 +86,9 @@
         Branches = await branchService.GetAll(Constants.BranchBaseUrl);
     }
 
-    private async Task GetDepartments()
+    private async Task GetGeneralDepartments()
     {
-        Departments = await departmentService.GetAll(Constants.DepartmentBaseUrl);
+        GeneralDepartments = await generalDepartmentService.GetAll(Constants.GeneralDepartmentBaseUrl);
     }
 
     void AddButtonClicked()

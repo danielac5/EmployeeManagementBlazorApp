@@ -28,7 +28,6 @@ public class EmployeeRepository(AppDbContext appDbContext) : IGenericRepositoryI
             .ThenInclude(b => b.City)
             .ThenInclude(c => c.Country)
             .Include(br => br.Branch)
-            .ThenInclude(d => d.Department)
             .ThenInclude(gd => gd.GeneralDepartment).ToListAsync();
         return employees;
     }
@@ -40,7 +39,6 @@ public class EmployeeRepository(AppDbContext appDbContext) : IGenericRepositoryI
         .ThenInclude(b => b.City)
         .ThenInclude(c => c.Country)
         .Include(br => br.Branch)
-        .ThenInclude(d => d.Department)
         .ThenInclude(gd => gd.GeneralDepartment).FirstOrDefaultAsync(ei => ei.Id == id)!;
 
         return employee!;
@@ -76,8 +74,6 @@ public class EmployeeRepository(AppDbContext appDbContext) : IGenericRepositoryI
         return Success();
 
     }
-
-
 
     private async Task Commit() => await appDbContext.SaveChangesAsync();
 

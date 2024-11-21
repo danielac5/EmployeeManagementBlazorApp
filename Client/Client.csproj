@@ -36,7 +36,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\BaseLibrary\BaseLibrary.csproj" />
-		<ProjectReference Include="..\ClientCommon\ClientCommon.csproj" />
+		<ProjectReference Include="..\ClientCommon\ClientLibrary.csproj" />
 	</ItemGroup>
 
 </Project>
